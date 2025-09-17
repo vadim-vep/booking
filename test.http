@@ -1,0 +1,4 @@
+###
+WEBSOCKET wss://stream-frontend.coinpaprika.com/ticks
+
+{"event":"subscribe","ids":["ondo-ondo","btc-bitcoin"]}
