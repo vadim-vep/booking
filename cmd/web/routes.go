@@ -5,6 +5,7 @@ import (
 	"booking/pkg/handlers"
 	"net/http"
 
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
@@ -24,4 +25,10 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Handle("/static/*", http.StripPrefix("/static/", fileServer))
 
 	return mux
+
+}
+
+type test struct {
+	App              *config.AppConfig
+	a, b, c, Session *scs.SessionManager
 }
