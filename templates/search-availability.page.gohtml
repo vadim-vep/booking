@@ -12,8 +12,10 @@
 
         <div class="row">
             <div class="col-md-6 offset-md-3">
-                <form action="reservation.html" method="get" novalidate class="needs-validation">
-
+                <form action="/search-availability" method="post" novalidate class="needs-validation">
+                    <label>
+                        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                    </label>
 
                     <div class="row">
                         <div class="col">

@@ -1,9 +1,10 @@
 package main
 
 import (
-	"booking/pkg/config"
-	"booking/pkg/handlers"
 	"net/http"
+
+	"github.com/vadim-vep/booking/internal/config"
+	"github.com/vadim-vep/booking/internal/handlers"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi"
@@ -14,6 +15,7 @@ func routes(app *config.AppConfig) http.Handler {
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.Recoverer)
+	//mux.Use(NoSurf)
 	mux.Use(NoSurf)
 	mux.Use(SessionLoad)
 
@@ -22,7 +24,11 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/about", http.HandlerFunc(handlers.Repo.About))
 	mux.Get("/generals-quarters", http.HandlerFunc(handlers.Repo.Generals))
 	mux.Get("/majors-suites", http.HandlerFunc(handlers.Repo.Majors))
+
 	mux.Get("/search-availability", http.HandlerFunc(handlers.Repo.Availability))
+	mux.Post("/search-availability", http.HandlerFunc(handlers.Repo.PostAvailability))
+	mux.Post("/search-availability-json", http.HandlerFunc(handlers.Repo.AvailabilityJSON))
+
 	mux.Get("/contacts", http.HandlerFunc(handlers.Repo.Contacts))
 	mux.Get("/make-reservation", http.HandlerFunc(handlers.Repo.Reservation))
 

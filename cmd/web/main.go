@@ -1,13 +1,14 @@
 package main
 
 import (
-	"booking/pkg/config"
-	"booking/pkg/handlers"
-	"booking/pkg/render"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/vadim-vep/booking/internal/config"
+	"github.com/vadim-vep/booking/internal/handlers"
+	"github.com/vadim-vep/booking/internal/render"
 
 	"github.com/alexedwards/scs/v2"
 )
