@@ -86,6 +86,7 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	//different validations for different fields
 	form.Required("first_name", "last_name", "email", "phone")
 	form.MinLength("first_name", 3, r)
+	form.IsEmail("email")
 
 	if !form.Valid() {
 		data := make(map[string]interface{})
@@ -96,7 +97,10 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 			Data: data})
 		return
 	}
+	//save the reservation to the session
+	m.App.Session.Put(r.Context(), "reservation", reservation)
 
+	http.Redirect(w, r, "/reservation-summary", http.StatusSeeOther)
 }
 
 // Generals renders the "generals" page template and saves the client's remote IP address into the session.
@@ -154,4 +158,23 @@ func (m *Repository) Contacts(w http.ResponseWriter, r *http.Request) {
 	remoteIP := r.RemoteAddr
 	m.App.Session.Put(r.Context(), "remoteIP", remoteIP)
 	render.RenderTemplate(w, r, "contacts.page.gohtml", &models.TemplateData{})
+}
+
+// ReservationSummary renders the "reservation-summary" page template and saves the client's remote IP address into the session.'
+func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
+	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
+	if !ok {
+		log.Println("Could not get reservation from session")
+		m.App.Session.Put(r.Context(), "error", "Could not get reservation from session")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+	m.App.Session.Remove(r.Context(), "reservation")
+
+	data := make(map[string]interface{})
+	data["reservation"] = reservation
+
+	render.RenderTemplate(w, r, "reservation-summary.page.gohtml", &models.TemplateData{
+		Data: data,
+	})
 }
