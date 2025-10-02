@@ -23,15 +23,6 @@ func NewForm(data url.Values) *Form {
 	}
 }
 
-// Has checks if a field exists in the form and is not empty
-func (f *Form) Has(field string, r *http.Request) bool {
-	x := r.Form.Get(field)
-	if x == "" {
-		return false
-	}
-	return true
-}
-
 // Required checks if a field exists in the form and is not empty
 func (f *Form) Required(fields ...string) {
 	for _, field := range fields {
@@ -40,6 +31,15 @@ func (f *Form) Required(fields ...string) {
 			f.Errors.AddError(field, "This field is required")
 		}
 	}
+}
+
+// Has checks if a field exists in the form and is not empty
+func (f *Form) Has(field string, r *http.Request) bool {
+	x := f.Get(field)
+	if x == "" {
+		return false
+	}
+	return true
 }
 
 // Valid checks if the form has any errors (true if no errors)
