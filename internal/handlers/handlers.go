@@ -3,11 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/vadim-vep/booking/internal/config"
 	"github.com/vadim-vep/booking/internal/forms"
+	"github.com/vadim-vep/booking/internal/helpers"
 	"github.com/vadim-vep/booking/internal/models"
 	"github.com/vadim-vep/booking/internal/render"
 )
@@ -34,33 +34,23 @@ func NewHandlers(r *Repository) {
 
 // renders the home page
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	remoteIP := r.RemoteAddr
-	m.App.Session.Put(r.Context(), "remoteIP", remoteIP)
 	render.RenderTemplate(w, r, "home.page.gohtml", &models.TemplateData{})
 }
 
-// About handles the "/about" route and renders the About page template with dynamic data from the session.
+// About handles the "/about" route and renders the About page template.
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 	//perform business logic
-	stringMap := make(map[string]string)
-	stringMap["test"] = "hello again"
-
-	remoteIP := m.App.Session.GetString(r.Context(), "remoteIP")
-	stringMap["remoteIP"] = remoteIP
 
 	//send the data to the template
-	render.RenderTemplate(w, r, "about.page.gohtml", &models.TemplateData{
-		StringMap: stringMap,
-	})
+	render.RenderTemplate(w, r, "about.page.gohtml", &models.TemplateData{})
 }
 
-// Reservation handles the "/make-reservation" route by saving the client's remote IP to the session and rendering the reservation page.
+// Reservation handles the "/make-reservation" route by rendering the reservation page.
 func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	remoteIP := r.RemoteAddr
-	m.App.Session.Put(r.Context(), "remoteIP", remoteIP)
 	var emptyReservation models.Reservation
 	data := make(map[string]interface{})
 	data["reservation"] = emptyReservation
+
 	render.RenderTemplate(w, r, "make-reservation.page.gohtml", &models.TemplateData{
 		Form: forms.NewForm(nil),
 		Data: data,
@@ -71,7 +61,7 @@ func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		log.Println(err)
+		helpers.ServerError(w, err)
 		return
 	}
 
@@ -85,7 +75,7 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	form := forms.NewForm(r.PostForm)
 	//different validations for different fields
 	form.Required("first_name", "last_name", "email", "phone")
-	form.MinLength("first_name", 3, r)
+	form.MinLength("first_name", 3)
 	form.IsEmail("email")
 
 	if !form.Valid() {
@@ -146,7 +136,7 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 
 	output, err := json.MarshalIndent(resp, "", "    ")
 	if err != nil {
-		log.Println(err)
+		helpers.ServerError(w, err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -164,7 +154,7 @@ func (m *Repository) Contacts(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
 	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		log.Println("Could not get reservation from session")
+		m.App.ErrorLog.Println("Could not get reservation from session")
 		m.App.Session.Put(r.Context(), "error", "Could not get reservation from session")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return

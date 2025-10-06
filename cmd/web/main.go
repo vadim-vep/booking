@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/vadim-vep/booking/internal/config"
 	"github.com/vadim-vep/booking/internal/handlers"
+	"github.com/vadim-vep/booking/internal/helpers"
 	"github.com/vadim-vep/booking/internal/models"
 	"github.com/vadim-vep/booking/internal/render"
 
@@ -19,8 +21,18 @@ const portNumber = ":8080"
 
 var app config.AppConfig
 var session *scs.SessionManager
+var infoLog *log.Logger
+var errorLog *log.Logger
+
+type AnyWithTags[T any] struct {
+	A string
+	B struct {
+		C T `asdasd`
+	}
+}
 
 func main() {
+
 	err := run()
 	if err != nil {
 		log.Fatal(err)
@@ -44,6 +56,12 @@ func run() error {
 	//change this to True when in production
 	app.InProduction = false
 
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.InfoLog = infoLog
+
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
 	session.Cookie.Persist = true
@@ -63,5 +81,6 @@ func run() error {
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
 	render.NewTemplates(&app)
+	helpers.NewHelpers(&app)
 	return nil
 }

@@ -1,7 +1,6 @@
 package forms
 
 import (
-	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -34,7 +33,7 @@ func (f *Form) Required(fields ...string) {
 }
 
 // Has checks if a field exists in the form and is not empty
-func (f *Form) Has(field string, r *http.Request) bool {
+func (f *Form) Has(field string) bool {
 	x := f.Get(field)
 	if x == "" {
 		return false
@@ -48,8 +47,8 @@ func (f *Form) Valid() bool {
 }
 
 // MinLength checks if a field is at least a certain length
-func (f *Form) MinLength(field string, length int, r *http.Request) bool {
-	x := r.Form.Get(field)
+func (f *Form) MinLength(field string, length int) bool {
+	x := f.Get(field)
 	if len(x) < length {
 		f.Errors.AddError(field, "This field must be at least "+strconv.Itoa(length)+" characters long")
 		return false

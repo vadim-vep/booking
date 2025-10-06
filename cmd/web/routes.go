@@ -7,8 +7,8 @@ import (
 	"github.com/vadim-vep/booking/internal/handlers"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 func routes(app *config.AppConfig) http.Handler {

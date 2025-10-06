@@ -5,16 +5,18 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 
 	"html/template"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/nosurf"
 	"github.com/vadim-vep/booking/internal/config"
+	"github.com/vadim-vep/booking/internal/helpers"
 	"github.com/vadim-vep/booking/internal/models"
 	"github.com/vadim-vep/booking/internal/render"
 )
@@ -31,6 +33,12 @@ func getRoutes() http.Handler {
 	//change this to True when in production
 	app.InProduction = false
 
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.InfoLog = infoLog
+
+	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
 	session.Cookie.Persist = true
@@ -38,6 +46,7 @@ func getRoutes() http.Handler {
 	session.Cookie.Secure = app.InProduction
 
 	app.Session = session
+	helpers.NewHelpers(&app)
 
 	tc, err := CreateTestTemplateCache()
 	if err != nil {
