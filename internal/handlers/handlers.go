@@ -6,10 +6,13 @@ import (
 	"net/http"
 
 	"github.com/vadim-vep/booking/internal/config"
+	"github.com/vadim-vep/booking/internal/driver"
 	"github.com/vadim-vep/booking/internal/forms"
 	"github.com/vadim-vep/booking/internal/helpers"
 	"github.com/vadim-vep/booking/internal/models"
 	"github.com/vadim-vep/booking/internal/render"
+	"github.com/vadim-vep/booking/internal/repository"
+	"github.com/vadim-vep/booking/internal/repository/dbrepo"
 )
 
 // TemplateData sent from handlers to templates
@@ -20,11 +23,15 @@ var Repo *Repository
 // Repository is Repository type type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 // NewRepo createst a new repository
-func NewRepo(a *config.AppConfig) *Repository {
-	return &Repository{App: a}
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
+	return &Repository{
+		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
+	}
 }
 
 // NewHandlers sets the repository for the handlers

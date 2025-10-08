@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/vadim-vep/booking/internal/config"
+	"github.com/vadim-vep/booking/internal/driver"
 	"github.com/vadim-vep/booking/internal/handlers"
 	"github.com/vadim-vep/booking/internal/helpers"
 	"github.com/vadim-vep/booking/internal/models"
@@ -33,10 +34,12 @@ type AnyWithTags[T any] struct {
 
 func main() {
 
-	err := run()
+	db, err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	defer db.SQL.Close()
 
 	fmt.Printf("Server started on port: %s\n", portNumber)
 
@@ -49,7 +52,7 @@ func main() {
 
 }
 
-func run() error {
+func run() (*driver.DB, error) {
 	//What we put in the session
 	gob.Register(models.Reservation{})
 
@@ -70,17 +73,24 @@ func run() error {
 
 	app.Session = session
 
+	//initialize and connect to DB
+	log.Println("Connecting to DB")
+	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=bookings user=vadym.veprytskyi password=*Z84kWPuhr123")
+	if err != nil {
+		log.Fatal("cannot connect to DB", err)
+	}
+
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("cannot create template cache", err)
-		return err
+		return nil, err
 	}
 	app.TemplateCache = tc
 	app.UseCache = false
 
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 	render.NewTemplates(&app)
 	helpers.NewHelpers(&app)
-	return nil
+	return db, nil
 }
