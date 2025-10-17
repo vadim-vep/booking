@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourcePerFileMappings">
+    <file url="file://$PROJECT_DIR$/internal/repository/dbrepo/postgres.go" value="846f1532-3c59-414c-91f5-d697bcf7f455" />
+    <file url="file://$PROJECT_DIR$/internal/repository/dbrepo/testRepo.go" value="846f1532-3c59-414c-91f5-d697bcf7f455" />
+    <file url="file://$PROJECT_DIR$/migrations/20251015100615_seed_rooms_table.postgres.down.sql" value="846f1532-3c59-414c-91f5-d697bcf7f455" />
+    <file url="file://$PROJECT_DIR$/migrations/20251015100615_seed_rooms_table.postgres.up.sql" value="846f1532-3c59-414c-91f5-d697bcf7f455" />
+    <file url="file://$PROJECT_DIR$/migrations/20251015120651_seed_restrictions_table.postgres.down.sql" value="846f1532-3c59-414c-91f5-d697bcf7f455" />
+    <file url="file://$PROJECT_DIR$/migrations/20251015124406_add_user_to_user_table.postgres.up.sql" value="846f1532-3c59-414c-91f5-d697bcf7f455" />
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/846f1532-3c59-414c-91f5-d697bcf7f455/console.sql" value="846f1532-3c59-414c-91f5-d697bcf7f455" />
   </component>
 </project>

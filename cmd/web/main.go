@@ -25,13 +25,6 @@ var session *scs.SessionManager
 var infoLog *log.Logger
 var errorLog *log.Logger
 
-type AnyWithTags[T any] struct {
-	A string
-	B struct {
-		C T `asdasd`
-	}
-}
-
 func main() {
 
 	db, err := run()
@@ -55,6 +48,9 @@ func main() {
 func run() (*driver.DB, error) {
 	//What we put in the session
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
 
 	//change this to True when in production
 	app.InProduction = false
@@ -79,6 +75,7 @@ func run() (*driver.DB, error) {
 	if err != nil {
 		log.Fatal("cannot connect to DB", err)
 	}
+	log.Println("Connected to DB")
 
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
@@ -90,7 +87,7 @@ func run() (*driver.DB, error) {
 
 	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
-	render.NewTemplates(&app)
+	render.NewRenderer(&app)
 	helpers.NewHelpers(&app)
 	return db, nil
 }

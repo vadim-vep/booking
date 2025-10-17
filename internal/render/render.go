@@ -19,8 +19,8 @@ var app *config.AppConfig
 
 var pathToTemplates = "./templates"
 
-// NewTemplates sets the config for a template function
-func NewTemplates(a *config.AppConfig) {
+// NewRenderer sets the config for a template function
+func NewRenderer(a *config.AppConfig) {
 	app = a
 }
 
@@ -33,7 +33,7 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 }
 
 // Renders tempaltes using HTML
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
+func Template(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 
 	var tc map[string]*template.Template
 

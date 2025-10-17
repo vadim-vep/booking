@@ -24,7 +24,7 @@
         </div>
         <div class="row">
             <div class="col text-center">
-                <a id="check-availability-button" href="#!" class="btn btn-success">Check availability</a>
+                <a id="check-availability-button" class="btn btn-success">Check availability</a>
             </div>
         </div>
     </div>
@@ -59,7 +59,8 @@
                     const elem = document.getElementById("reservation-dates-modal");
                     const rp = new DateRangePicker(elem, {
                         format: 'yyyy-mm-dd',
-                        showOnFocus: false,
+                        showOnFocus: true,
+                        minDate: new Date(),
                     })
                 },
 
@@ -74,16 +75,34 @@
                     let form = document.getElementById("check-availability-form");
                     let formData = new FormData(form);
                     formData.append("csrf_token", "{{.CSRFToken}}");
+                    formData.append("room_id", "1");
 
                     fetch("/search-availability-json", {
                         method: "post",
                         body: formData,
+
                     })
                         .then(response => response.json())
                         .then(data => {
-                            console.log(data);
-                            console.log(data.ok);
-                            console.log(data.message);
+                            if (data.ok) {
+                                attention.custom({
+                                    icon:'success',
+                                    showConfirmButton: false,
+                                    msg: '<p>Room is available</p>'
+                                    + '<p><a href="/book-room?id='
+                                    + data.room_id
+                                    + '&s='
+                                    + data.start_date
+                                    + '&e='
+                                    + data.end_date
+                                    + '" class="btn btn-primary">'
+                                    +'Book room now</a></p>'
+                                })
+                            } else {
+                                attention.error({
+                                    msg: "Room not available",
+                                });
+                            }
                         })
                 }
             });
